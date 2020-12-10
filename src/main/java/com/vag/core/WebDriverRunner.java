@@ -3,7 +3,9 @@ package com.vag.core;
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
 import com.relevantcodes.extentreports.LogStatus;
+import com.vag.reporter.TestReporter;
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
@@ -14,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 @Listeners(WebDriverRunner.class)
 public class WebDriverRunner implements IResultListener {
-	static ThreadLocal<WebDriver> driverThreadLocal = new ThreadLocal<>();
-	static ThreadLocal<ExtentTest> extentTestThreadLocal = new ThreadLocal<>();
+	public static ThreadLocal<WebDriver> driverThreadLocal = new ThreadLocal<>();
+	public static ThreadLocal<ExtentTest> extentTestThreadLocal = new ThreadLocal<>();
 	static int implicitWaitTimeOut = 10;
 	static int pageWaitTimeOut = 10;
 	static String BType = "CHROME";
@@ -37,6 +39,11 @@ public class WebDriverRunner implements IResultListener {
 
 	public static void setBrowser(Browsers browser) {
 		BType = browser.toString();
+	}
+
+	public synchronized static void exitTest(String reason) {
+		TestReporter.writeFail("Exit", reason);
+		Assert.assertTrue(false, reason);
 	}
 
 	private void openDriver() {
@@ -80,10 +87,10 @@ public class WebDriverRunner implements IResultListener {
 		getDriver().quit();
 	}
 
-
 	@AfterSuite(alwaysRun = true)
 	public synchronized void initializeAfterSuite() {
 		extentReports.close();
+
 	}
 
 	@Override
@@ -93,18 +100,16 @@ public class WebDriverRunner implements IResultListener {
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		extentTestThreadLocal.get().log(LogStatus.PASS, "");
 	}
 
 	@Override
 	public void onTestFailure(ITestResult result) {
-		extentTestThreadLocal.get().log(LogStatus.FAIL, "");
 
 	}
 
 	@Override
 	public void onTestSkipped(ITestResult result) {
-		extentTestThreadLocal.get().log(LogStatus.SKIP, "");
+		extentTestThreadLocal.get().log(LogStatus.SKIP, result.getName() + " got skipped");
 
 	}
 
