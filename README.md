@@ -22,8 +22,8 @@ Selenium+RestAssured+TestNG+ExtentReport+Maven.
 - Can run the weather comparison test following ways,
     * mvn test
     * mvn test -Dtest=WeatherComparisonTest or
-        * mvn test -Dsurefire.suiteXmlFile=src/test/resources/TestSuites/WeatherComparisonSuite.xml
+    * mvn test -Dsurefire.suiteXmlFile=src/test/resources/TestSuites/WeatherComparisonSuite.xml
 
 **Reporting:**
-This framework creates extent report and will be placed at ../WeatherAutomation/HtmlReport/Extent.html * Attached sample
-test execution report 
+This framework creates extent report and will be placed at ../WeatherAutomation/HtmlReport/Extent.html
+   * Attached sample test execution report 
