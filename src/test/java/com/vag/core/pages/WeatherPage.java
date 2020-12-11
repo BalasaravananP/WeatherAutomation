@@ -8,8 +8,11 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.vag.core.WebDriverRunner.getDriver;
 
@@ -24,6 +27,9 @@ public class WeatherPage {
 
 	@FindBy(css = "div.leaflet-pane.leaflet-marker-pane div.my-div-icon div.cityText")
 	List<WebElement> mapCityTexts;
+
+	@FindBy(css = "div.leaflet-popup-content-wrapper span.heading")
+	List<WebElement> weatherDetails;
 
 	private WeatherPage() {
 		PageFactory.initElements(getDriver(), this);
@@ -84,8 +90,22 @@ public class WeatherPage {
 		return mapCityText.isPresent();
 	}
 
-	public boolean verifyCityDisplayedInMap(String city) {
-		final Optional<WebElement> mapCityText = mapCityTexts.stream().filter(webElement -> city.equalsIgnoreCase(webElement.getText().trim())).findAny();
-		return mapCityText.isPresent();
+	public Map<String, String> getCityWeatherInformationFromMap(String city) {
+		Map<String, String> weatherInfo = new HashMap<>();
+		if (checkCityDisplayedInMap(city)) {
+			List<WebElement> cityContainer = getDriver().findElements(By.xpath("//div[@class='leaflet-pane leaflet-marker-pane']//div[contains(@class,'my-div-icon')]//div[@title='" + city + "']"));
+			if (cityContainer.size() > 0) {
+				cityContainer.get(0).click();
+				TestReporter.writePass("Info", "Clicked on City in Map");
+
+				weatherInfo = weatherDetails.stream().map(WebElement::getText).collect(Collectors.toMap(text -> text.split(":")[0].trim(), text -> text.split(":")[1].trim()));
+			} else {
+				TestReporter.writeFail("Error", city + " is not displayed in Map");
+			}
+
+		} else {
+			TestReporter.writeFail("Error", city + " is not displayed in Map");
+		}
+		return weatherInfo;
 	}
 }

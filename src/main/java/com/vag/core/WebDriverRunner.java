@@ -71,9 +71,14 @@ public class WebDriverRunner implements IResultListener {
 	}
 
 	@BeforeMethod(alwaysRun = true)
-	public synchronized void initializeBeforeMethod(Method method) {
+	public synchronized void initializeBeforeMethod(Method method, Object[] testData, ITestContext ctx) {
 		String testCaseName = method.getName();
-		extentTest = extentReports.startTest(testCaseName);
+
+		if (testData.length > 0) {
+			extentTest = extentReports.startTest(method.getName() + "-" + testData[0].toString());
+		} else {
+			extentTest = extentReports.startTest(testCaseName);
+		}
 		extentTestThreadLocal.set(extentTest);
 		openDriver();
 

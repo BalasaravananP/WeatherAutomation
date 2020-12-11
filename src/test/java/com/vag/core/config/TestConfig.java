@@ -33,6 +33,15 @@ public class TestConfig extends BaseClass {
 		}
 	}
 
+	public boolean compareWeatherValuesInRange(double value1, double value2, int tolerance) {
+		double differenceValue = Math.abs(value1 - value2);
+		if (differenceValue <= tolerance) {
+			return TestReporter.writePass("Pass", "The difference of temp values are within tolerance(" + tolerance + ")- Difference: " + differenceValue);
+		} else {
+			return TestReporter.writePass("Pass", "The difference of temp values are not within tolerance(" + tolerance + ")- Difference: " + differenceValue);
+		}
+	}
+
 	public BasePage ndtv() {
 		return BasePage.getInstance();
 	}
